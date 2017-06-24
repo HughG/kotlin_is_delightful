@@ -47,6 +47,7 @@
         height: 92%;
         float: left;
       }
+      /*
       .left-column h3 {
         margin: 0.5em 0em 0em 0.5em;
         font-size: 120%;
@@ -55,6 +56,7 @@
         margin: 0.5em 0em 0em 1.5em;
         font-size: 100%;
       }
+      */
       .left-column .current {
         color: #ddd;
       }
@@ -62,6 +64,9 @@
         width: 75%;
         float: right;
         /*padding-top: 1em;*/
+      }
+      .clear {
+        clear: both;
       }
     </style>
   </head>
@@ -88,7 +93,7 @@ class: center, middle
 
 ---
 
-# Why a new programming language?
+# Why program in Kotlin?
 
 --
 
@@ -98,45 +103,62 @@ Not because it's a panacea
 
 ---
 
-# Why a new programming language?
+# Why program in Kotlin?
+
+## Because it's delightful!
 
 --
 
-Cross-ecosystem
+... and also
 
 --
 
-Powerful
+* cross-ecosystem
 
 --
 
-Elegant
+* powerful
 
 --
 
-Easy
+* elegant
 
 --
 
-Professional
+* easy to learn
 
 --
 
-Delightful!
+* professional
+
+---
+
+# Delightful features (IMHO)
+
+* Cross-ecosystem
+* Type inference
+* Types are non-nullable by default
+* No checked exceptions
+* Inline functions + lambdas = syntactic macros & type-safe builders
+* Coroutines
+* Property delegation
+* Class delegation
+* Co- and contra-variance, at both declaration and use sites
 
 ---
 
 .left-column[
-## Why?
+## Delightful features
 ### .current[Cross-ecosystem]
-### Powerful
-### Elegant
-### Easy
-### Professional
+### Type inference
+### Non-null types
+### Inline + lambdas
+### Coroutines
+### Property delegation
+### Class delegation
+### Type variance
 ]
 .right-column[
-# Cross-ecosystem
-
 Apply the same language cross-platform and cross-stack
 
 Compile to JVM, JavaScript, or native code (alpha)
@@ -151,20 +173,33 @@ In future, build multi-platform modules
 ---
 
 .left-column[
-## Why?
-### Cross-ecosystem
-#### .current[JVM]
-#### JavaScript
-#### Native
-### Powerful
-### Elegant
-### Easy
-### Professional
+### Delightful features
 ]
 .right-column[
-# JVM
+# Cross-ecosystem
+]
+.clear[
+Apply the same language cross-platform and cross-stack
 
-Based on JDK 8
+Compile to JVM, JavaScript, or native code (alpha)
+
+Standard cross-platform libary
+
+Easy access to other platform libraries
+
+In future, build multi-platform modules
+]
+
+---
+
+.left-column[
+### Delightful features
+]
+.right-column[
+# Cross-ecosystem: JVM
+]
+.clear[
+Based on JDK 7, 8, or 9
 
 Easy to learn if you know Java
 
@@ -175,25 +210,20 @@ Officially supported by Google for Android
 Officially supported by Spring
 ]
 
+???
+
+Can't generate JDK 9 modules, as of 1.1.3.
+
 ---
 
 .left-column[
-## Why?
-### Cross-ecosystem
-#### JVM
-#### .current[JavaScript]
-#### Native
-### Powerful
-### Elegant
-### Easy
-### Professional
+### Delightful features
 ]
 .right-column[
-# JavaScript
-
+# Cross-ecosystem: JavaScript
+]
+.clear[
 More powerful than TypeScript or Flow
-
-* Not a strict superset, e.g., no Flow-style union types
 
 Client-side in browser
 
@@ -201,33 +231,233 @@ Server-side in Node.js
 
 Define strongly-typed interfaces to JS modules
 
-* Tool to _mostly_ translate from TypeScript
+* `ts2kt` tool to _mostly_ translate from TypeScript
 
 Build your own standard JS modules
 ]
 
+???
+
+Not a strict supserset of Flow (e.g., no union types) but does more than just provide better type info.
+
 ---
 
 .left-column[
-## Why?
-### Cross-ecosystem
-#### JVM
-#### JavaScript
-#### .current[Native]
-### Powerful
-### Elegant
-### Easy
-### Professional
+### Delightful features
 ]
 .right-column[
-# Native
+# Cross-ecosystem: Native
+]
+.clear[
+Alpha quality
 
 LLVM-based
 
-Alpha: Ubuntu Linux, Raspberry Pi, iOS, MacOS
+Efficient, type-safe access to C
 
-Pre-alpha: Windows
+* `cinterop` generates Kotlin wrappers from C headers
+
+Create multi-platform libraries
+
+Platforms: Ubuntu Linux, Raspberry Pi, iOS, MacOS, Windows
+
+GC: Automatic ref-counting with cycle detection
 ]
+
+???
+
+https://blog.jetbrains.com/kotlin/2017/04/kotlinnative-tech-preview-kotlin-without-a-vm/
+
+https://github.com/JetBrains/kotlin-native/blob/v0.1.0/INTEROP.md
+
+https://blog.jetbrains.com/kotlin/2017/06/kotlinnative-v0-3-is-out/
+
+---
+.left-column[
+### Delightful features
+]
+.right-column[
+# Non-nullable types
+]
+.clear[
+```
+class Person(
+        val name: String,
+        var nickname: String? = null
+) {
+
+    fun sayHello() {
+        val splitNick = nickname?.split(' ')
+        val myName = when(splitNick?.size) {
+            null -> name
+            // At this point Kotlin knows splitNick is not null
+            1 -> nickname ?: name
+            else -> splitNick.map { it.first() }.joinToString()
+        }
+        println("Hello, my name is $myName")
+    }
+}
+```
+]
+
+???
+---
+
+.left-column[
+### Delightful features
+]
+.right-column[
+# Type inference
+]
+.clear[
+```
+// size inferred as Double
+var size = 10.0
+fun foo1() {
+    size = 11 // compile error
+}
+
+fun <T> forEach(items: Collection<T>, block: (T) -> Unit) {
+    // item inferred as T
+    for (item in items) block(item)
+}
+
+fun foo2() {
+    // it inferred as Int
+    forEach(listOf(1, 2, 3)) { print(it + 1) }
+}
+```
+]
+
+???
+
+---
+
+.left-column[
+### Delightful features
+]
+.right-column[
+# Type inference
+]
+.clear[
+```
+// Return type defaults to Unit (like void)
+fun <T> maybeDo(o: T?, block: (T) -> Unit) {
+    if (o != null) {
+        // o inferred as T (not T?)
+        block(o)
+    }
+}
+
+// Shorthand for single-expression function
+fun throwAnything(o: Any): Nothing = when(o) {
+    is Throwable -> throw o // o inferred as Throwable
+    is String -> throw Exception(o) // o inferred as String
+    else -> throw Exception(o.toString())
+}
+```
+]
+
+???
+
+Return type of `Nothing` implies "does not return".
+
+.left-column[
+### Delightful features
+]
+.right-column[
+# No checked exceptions
+]
+.clear[
+'Nuff said
+]
+
+???
+---
+
+.left-column[
+### Delightful features
+]
+.right-column[
+# Inline functions + lambdas
+]
+.clear[
+```
+inline fun <T: Closeable?> T.autoClose(block: (T) -> Unit) {
+    var caught: Boolean = false
+    try {
+        block(this)
+    } catch (e: Exception) {
+        caught = true
+        try { this?.close() }
+        catch (e2: Exception) { e.addSuppressed(e2); throw e }
+    } finally {
+        if (!caught) { this?.close() }
+    }
+}
+
+fun getFirstLineStartingWith(fileName: String, prefix: String): String? {
+    FileReader(File("foo.txt")).autoClose {
+        it.useLines { it.forEach { if (it.startsWith(prefix)) return it } }
+    }
+    return null
+}
+```
+]
+
+???
+
+`autoClose`, `useLines`, `forEach` and the innermost block are all inlined
+into `getFirstLineStartingWith`, so the `return` will return from that
+function.
+
+Keywords `noinline` and `crossinline` allow you to declare restrictions
+on how function-typed arguments can be inlined.
+
+---
+
+.left-column[
+### Delightful features
+]
+.right-column[
+# Property delegation
+]
+.clear[
+
+]
+
+???
+---
+
+.left-column[
+### Delightful features
+]
+.right-column[
+# Class delegation
+]
+.clear[
+
+]
+
+???
+---
+
+.left-column[
+### Delightful features
+]
+.right-column[
+# Coroutines
+]
+.clear[
+
+]
+
+???
+---
+
+
+
+
 
 ---
 
