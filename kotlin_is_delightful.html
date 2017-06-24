@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Title</title>
+    <meta charset="utf-8">
+    <style>
+      @import url(https://fonts.googleapis.com/css?family=Fira+Mono|Merriweather:300|Open+Sans);
+
+      body {
+        font-family: 'Merriweather', serif;
+      }
+      body.remark-container {
+        background: #000;
+        color: #ddd;
+      }
+      .remark-slide-scaler {
+          transform-origin: top-left;
+          -moz-box-shadow: 0 0 30px #222;
+          -webkit-box-shadow: 0 0 30px #222;
+          box-shadow: 0 0 30px #222;
+      }
+      .remark-slide-content {
+        background: #222;
+      }
+      h1, h2, h3, h4 {
+        font-family: 'Open Sans', sans-serif;
+        font-weight: bold;
+      }
+      /*
+      p + ul, li + li {
+        margin-top: -0.66em;
+      }
+      */
+      code {
+        border-radius: 5px;
+      }
+      .remark-code, .remark-inline-code { font-family: 'Fira Mono', monospace; }
+      .remark-code-span-highlighted {
+        background-color: rgba(255, 255, 0, 0.35);
+        border: 1.5px solid #BB0;
+      }
+      
+      /* Two-column layout */
+      .left-column {
+        color: #888;
+        width: 20%;
+        height: 92%;
+        float: left;
+      }
+      .left-column h3 {
+        margin: 0.5em 0em 0em 0.5em;
+        font-size: 120%;
+      }
+      .left-column h4 {
+        margin: 0.5em 0em 0em 1.5em;
+        font-size: 100%;
+      }
+      .left-column .current {
+        color: #ddd;
+      }
+      .right-column {
+        width: 75%;
+        float: right;
+        /*padding-top: 1em;*/
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="source" style="display: none">
+
+class: center, middle
+
+# Title
+
+---
+
+<!--- layout: true --->
+
+# Layout
+
+---
+
+# Overview
+
+1. Why a new programming language?
+2. Deep-dive
+3. ...
+
+---
+
+# Why a new programming language?
+
+--
+
+Not because it's a panacea
+
+(TODO: Quote about failure reason being that you're doing the wrong thing.)
+
+---
+
+# Why a new programming language?
+
+--
+
+Cross-ecosystem
+
+--
+
+Powerful
+
+--
+
+Elegant
+
+--
+
+Easy
+
+--
+
+Professional
+
+--
+
+Delightful!
+
+---
+
+.left-column[
+## Why?
+### .current[Cross-ecosystem]
+### Powerful
+### Elegant
+### Easy
+### Professional
+]
+.right-column[
+# Cross-ecosystem
+
+Apply the same language cross-platform and cross-stack
+
+Compile to JVM, JavaScript, or native code (alpha)
+
+Standard cross-platform libary
+
+Easy access to other platform libraries
+
+In future, build multi-platform modules
+]
+
+---
+
+.left-column[
+## Why?
+### Cross-ecosystem
+#### .current[JVM]
+#### JavaScript
+#### Native
+### Powerful
+### Elegant
+### Easy
+### Professional
+]
+.right-column[
+# JVM
+
+Based on JDK 8
+
+Easy to learn if you know Java
+
+Great interop both ways
+
+Officially supported by Google for Android
+
+Officially supported by Spring
+]
+
+---
+
+.left-column[
+## Why?
+### Cross-ecosystem
+#### JVM
+#### .current[JavaScript]
+#### Native
+### Powerful
+### Elegant
+### Easy
+### Professional
+]
+.right-column[
+# JavaScript
+
+More powerful than TypeScript or Flow
+
+* Not a strict superset, e.g., no Flow-style union types
+
+Client-side in browser
+
+Server-side in Node.js
+
+Define strongly-typed interfaces to JS modules
+
+* Tool to _mostly_ translate from TypeScript
+
+Build your own standard JS modules
+]
+
+---
+
+.left-column[
+## Why?
+### Cross-ecosystem
+#### JVM
+#### JavaScript
+#### .current[Native]
+### Powerful
+### Elegant
+### Easy
+### Professional
+]
+.right-column[
+# Native
+
+LLVM-based
+
+Alpha: Ubuntu Linux, Raspberry Pi, iOS, MacOS
+
+Pre-alpha: Windows
+]
+
+---
+
+.left-column[
+## Why?
+### Cross-ecosystem
+### .current[Powerful]
+### Elegant
+### Easy
+### Professional
+]
+.right-column[
+# Powerful
+
+Multi-paradigm
+
+* OOP
+* Procedural
+* Higher-order functions
+* Generics
+
+Extensible
+
+* Extension functions
+* Inline functions + lambdas = block macros & type-safe builders
+* Coroutines
+]
+
+---
+
+.left-column[
+## Why?
+### Cross-ecosystem
+### Powerful
+### .current[Elegant]
+### Easy
+### Professional
+]
+.right-column[
+# Elegant
+
+Concise
+
+* Type inference
+* Auto-generated accessors for fields
+* Define fields within default constructor
+* Data classes
+
+Same concepts used in different contexts
+
+* Properties, delegated properties, functions, and extension functions  
+can be global, class-local, or function-local
+* Constructors and factory methods have the same syntax
+* Coroutine mechanism can be extended to  
+async calls, sequence generators, channels, thread pools, etc.
+]
+
+---
+
+.left-column[
+## Why?
+### Cross-ecosystem
+### Powerful
+### Elegant
+### .current[Easy]
+### Professional
+]
+.right-column[
+# Easy
+
+Easy to learn if you know Java, C#, or TypeScript
+
+Principle of least surprise
+
+Good documentation and examples
+
+Active communities on forums, StackOverflow, Slack, etc.
+]
+
+---
+
+.left-column[
+## Why?
+### Cross-ecosystem
+### Powerful
+### Elegant
+### Easy
+### .current[Professional]
+]
+.right-column[
+# Professional
+
+Commercially supported by creators, JetBrains
+
+* Used internally for their products
+
+Well supported even in free version of IntelliJ IDEA
+
+Also integrates with Eclipse, Android Studio, Maven, Gradle
+
+* You can even write Gradle scripts in Kotlin!
+
+Compiler is open source (Apache licence)
+]
+
+---
+
+.left-column[
+## Delightful!
+### Awesome things
+### Syntactic sugar
+### Nice surprises
+]
+.right-column[
+# Professional
+
+Commercially supported by creators, JetBrains
+
+* Used internally for their products
+
+Well supported even in free version of IntelliJ IDEA
+
+Also integrates with Eclipse, Android Studio, Maven, Gradle
+
+* You can even write Gradle scripts in Kotlin!
+
+Compiler is open source (Apache licence)
+]
+
+---
+
+# Code Sample
+
+```
+class MapWithDefault<K, out V>(
+        private val m: MutableMap<K, V>,
+        private val defaultValue: () -> V
+) : Map<K, V> `by m` {
+    override fun get(key: K): V? = m.getOrPut(key, defaultValue)
+}
+```
+
+--
+
+```
+fun <K, V> MutableMap<K, V>.withDefaultValue(
+        defaultValue: () -> V
+): Map<K, V> = MapWithDefault(this, defaultValue)
+```
+
+---
+
+
+
+
+    </textarea>
+    <script src="https://remarkjs.com/downloads/remark-latest.min.js">
+    </script>
+    <script>
+      var slideshow = remark.create({
+        ratio: '16:9',
+        highlightLanguage: 'kotlin',
+        highlightStyle: 'tomorrow-night-bright',
+        highlightSpans: true,
+      });
+    </script>
+  </body>
+</html>
