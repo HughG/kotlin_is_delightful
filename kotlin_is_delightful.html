@@ -26,11 +26,9 @@
         font-family: 'Open Sans', sans-serif;
         font-weight: bold;
       }
-      /*
-      p + ul, li + li {
-        margin-top: -0.66em;
-      }
-      */
+      *:link { color: #33d; }
+      a:hover { color: #55d; }
+      *:visited { color: #d3d; }
       .remark-code, .remark-inline-code {
         background: black;
         font-family: 'Fira Mono', monospace;
@@ -89,31 +87,49 @@
 
 class: center, middle
 
-# Title
+# Kotlin is Delightful :-)
 
----
+## Hugh Greene <hughg@tameter.org>  
 
-<!--- layout: true --->
+### June 2007
 
-# Layout
+???
+
+In this talk I'm going to introduce you to the delightful programming language, Kotlin.
+
+I'm not going to walk exhaustively through the basic syntax, just show you the coolest bits :-)
+with some asides for minor cool features.
 
 ---
 
 # Overview
 
-1. Why a new programming language?
-2. Deep-dive
-3. ...
+1. Why program in Kotlin?
+2. Delightful features
+3. Syntactic sugar
+4. Nice surprises
+5. Not-so-nice(?) surprises
+6. Other features
+
+---
+
+class: center, middle
+
+# Why program in Kotlin?
 
 ---
 
 # Why program in Kotlin?
 
+## Not because it's a panacea.
+
+There are many causes of project failure (or success)  
+and the choice of programming language and ecosystem  
+is a relatively minor one.
+
 --
 
-Not because it's a panacea
-
-(TODO: Quote about failure reason being that you're doing the wrong thing.)
+However, good tools make a developer's life more pleasant.
 
 ---
 
@@ -135,7 +151,11 @@ Not because it's a panacea
 
 --
 
-* elegant
+* parsimonious
+
+--
+
+* pragmatic
 
 --
 
@@ -144,6 +164,25 @@ Not because it's a panacea
 --
 
 * professional
+
+???
+
+(The opportunity to use the word "parsimonious" is in itself delightful :-)
+Parsimony here means "economy in the use of means to an end": rather than having multiple ways to do things,
+it tends to use the same constructs to acheive several ends.
+
+Pragmatic in that it gives you clear, easy ways to do many things.
+
+Easy to learn if you know Java, Groovy, C#, Swift, and probably C++.
+Worth learning if you know JavaScript or TypeScript.
+
+Professional in the sense that it has good tooling, commercial support, and is stable.
+
+---
+
+class: center, middle
+
+# Delightful Features
 
 ---
 
@@ -284,7 +323,6 @@ class Person(
         val name: `String`,
         var nickname: String`?` = null
 ) {
-
     fun sayHello() {
         val splitNick = nickname`?.`split(' ')
         val myName = when(splitNick?.size) {
@@ -300,6 +338,11 @@ class Person(
 ]
 
 ???
+
+`val` declares a constant reference variable, `var` declares a mutable one.
+
+Declaring constructor parameters with `val`/`var` generates properties
+and assigns them on construction.
 
 If you call a Java API, Kotlin lets you treat it as nullable or not.
 If you treat it as non-nullable and it is in fact `null`, you'll get a
@@ -369,6 +412,9 @@ fun throwAnything(o: Any): Nothing = when(o) {
 
 ???
 
+`(T) -> Unit` is a function type, taking an instance of `T` and returning
+with no result.
+
 The definition of `throwAnything` shows the shorthand for a single-expression function.
 
 The return type of `Nothing` means "does not return".  The compiler will, for example,
@@ -393,13 +439,17 @@ The theory of checked exceptions is: they are part of an API, so they should be 
 ]
 
 ???
+
+Maybe if a language also provided pre- and post-condition checking, or
+software transactional memory, they would be more useful.
+
 ---
 
 .left-column[
 ### Delightful features
 ]
 .right-column[
-# Inline functions + lambdas
+# Inline + lambdas: "macros"
 ]
 .clear[
 ```
@@ -427,12 +477,54 @@ fun getFirstLineStartingWith(fileName: String, prefix: String): String? {
 
 ???
 
+`autoClose` is declared as an extension function on `T`.
+
 `autoClose`, `useLines`, `forEach` and the innermost block are all inlined
 into `getFirstLineStartingWith`, so the `return` will return from that
 function.
 
 Keywords `noinline` and `crossinline` allow you to declare restrictions
 on how function-typed arguments can be inlined.
+---
+
+.left-column[
+### Delightful features
+]
+.right-column[
+# Inline + lambdas: builders
+]
+.clear[
+```
+fun sort(header: HTMLTableCellElement): Unit = `TODO()`
+
+fun getPeopleTable(entries: Map<String, Int>): HTMLElement {
+    fun TR.sortableTh(block: TR.() -> Unit) {
+        block()
+        onClickFunction = { sort(it.target as HTMLTableCellElement) }
+    }
+    return document.create.`div` {
+        h2 { +"People" }
+        table {
+            tr { sortableTh { +"Name" }; sortableTh { +"Age" } }
+            for ((name, age) in entries) {
+                tr { th { +name }; th { +age.toString() } }
+            }
+        }
+    }
+}
+```
+]
+
+???
+
+`sortableTh` is an extension function, and accepts a `block` which is itself
+an extension function.
+
+The `TODO()` function always throws a "not implemented" exception.
+
+Within each block, only the methods for the appropriate HTML elements are available.
+
+The "unary plus" operator is used to insert text.
 
 ---
 
@@ -484,7 +576,7 @@ interface HasSqlId {
     val id: Int
 }
 
-object DbConfig {
+ `object` DbConfig {
     lateinit var url: String
 }
 
@@ -555,7 +647,7 @@ class SqlDelegate : ReadWriteProperty<HasSqlId, String> {
         }
     }
     
-    override fun setValue(thisRef: HasSqlId, property: KProperty<*>, value: String) = `TODO()`
+    override fun setValue(thisRef: HasSqlId, property: KProperty<*>, value: String) = TODO()
 }
 ```
 ]
@@ -564,8 +656,6 @@ class SqlDelegate : ReadWriteProperty<HasSqlId, String> {
 
 Delegates don't have to implement the `ReadWriteProperty` or `ReadOnlyProperty` interfaces,
 they just have to provide `operator fun getValue`/`setValue` with the right signature.
-
-The `TODO()` function always throws a "not implemented" exception.
 
 ---
 
@@ -580,17 +670,17 @@ The `TODO()` function always throws a "not implemented" exception.
 class LimitedIterator<T>(
         val limit: Int,
         private val wrapped: Iterator<T>
-): Iterator<T> by wrapped {
+): Iterator<T> `by wrapped` {
     private var count = 0
 
-    override fun next(): T {
+    `override` fun next(): T {
         if (++count > limit) {
             throw IllegalStateException("No more than $limit items can be read")
         }
         return wrapped.next()
     }
 
-    override fun hasNext(): Boolean {
+    `override` fun hasNext(): Boolean {
         return count < limit && wrapped.hasNext()
     }
     
@@ -704,11 +794,11 @@ fun doAjax() = async {
         key = jQuery.ajax("https://server/api/firstStep").await()
         showResult(jQuery.ajax("https://server/api/secondStep?key=$key").await())
     } catch(e: Exception) {
-        if (key == null) {
-            showResult("Failed to get key: ${e.message}")
+        showResult(if (key == null) {
+            "Failed to get key: ${e.message}"
         } else {
-            showResult("Invalid key $key: ${e.message}")
-        }
+            "Invalid key $key: ${e.message}"
+        })
     }
 }
 ```
@@ -718,7 +808,9 @@ fun doAjax() = async {
 
 This example assumes the existence of `external` definitions for jQuery, and of
 the definition for JavaScript's `Promise` type in the Kotlin standard library.
-.
+
+`if` can be an expression; using `when` would be even shorter here, but still
+easily understandable.
 
 ---
 
@@ -753,64 +845,6 @@ inline suspend fun <T> JQueryPromise<T>.await() = suspendCoroutine<T?> { c ->
 ```
 ]
 
-???
----
-
-
-.left-column[
-## Why?
-### Cross-ecosystem
-### .current[Powerful]
-### Elegant
-### Easy
-### Professional
-]
-.right-column[
-# Powerful
-
-Multi-paradigm
-
-* OOP
-* Procedural
-* Higher-order functions
-* Generics
-
-Extensible
-
-* Extension functions
-* Inline functions + lambdas = block macros & type-safe builders
-* Coroutines
-]
-
----
-
-.left-column[
-## Why?
-### Cross-ecosystem
-### Powerful
-### .current[Elegant]
-### Easy
-### Professional
-]
-.right-column[
-# Elegant
-
-Concise
-
-* Type inference
-* Auto-generated accessors for fields
-* Define fields within default constructor
-* Data classes
-
-Same concepts used in different contexts
-
-* Properties, delegated properties, functions, and extension functions  
-can be global, class-local, or function-local
-* Constructors and factory methods have the same syntax
-* Coroutine mechanism can be extended to  
-async calls, sequence generators, channels, thread pools, etc.
-]
-
 ---
 
 .left-column[
@@ -830,7 +864,6 @@ Principle of least surprise
 
 Good documentation and examples
 
-Active communities on forums, StackOverflow, Slack, etc.
 ]
 
 ---
@@ -857,6 +890,8 @@ Also integrates with Eclipse, Android Studio, Maven, Gradle
 * You can even write Gradle scripts in Kotlin!
 
 Compiler is open source (Apache licence)
+
+Active communities on forums, StackOverflow, Slack, etc.
 ]
 
 ---
@@ -907,6 +942,12 @@ fun <K, V> MutableMap<K, V>.withDefaultValue(
 
 ---
 
+# Sealed classes
+
+TODO: HTTP response codes
+
+---
+
 
 Co- and contra-variance at both declaration and use sites.
 
@@ -916,13 +957,16 @@ Co- and contra-variance at both declaration and use sites.
 
 ## Extensions
 
-Extension methods and properties can exist at top-level, within a class, or within a function.
-
-## Property delegation
-
-Delegated properties can exist at top-level, within a class, or within a function.
+Properties, delegated properties, and extension functions
+can exist at top-level, within a class, or within a function.
 
 Property delegation is based on objects, not classes, so you can use singleton objects as delegates.
+
+Constructors and factory methods have the same syntax,
+so switching to use factory methods needs little code change.
+
+Coroutines can be extended to async calls, sequence generators, channels, thread pools, etc.
+
 
 
 ---
