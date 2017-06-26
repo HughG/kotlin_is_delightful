@@ -38,7 +38,7 @@
       .remark-inline-code {
         background: #111;
         border-radius: 5px;
-        padding: .2em;
+        padding: 0.075em 0.2em;
       }
       .remark-code-span-highlighted {
         background-color: rgba(255, 255, 0, 0.35);
@@ -91,7 +91,7 @@ class: center, middle
 
 ## Hugh Greene <hughg@tameter.org>  
 
-### June 2007
+### June 2017
 
 ???
 
@@ -109,7 +109,7 @@ with some asides for minor cool features.
 3. Syntactic sugar
 4. Nice surprises
 5. Not-so-nice(?) surprises
-6. Other features
+6. Other aspects
 
 ---
 
@@ -182,7 +182,7 @@ Professional in the sense that it has good tooling, commercial support, and is s
 
 class: center, middle
 
-# Delightful Features
+# Delightful features
 
 ---
 
@@ -847,38 +847,164 @@ inline suspend fun <T> JQueryPromise<T>.await() = suspendCoroutine<T?> { c ->
 
 ---
 
-.left-column[
-## Why?
-### Cross-ecosystem
-### Powerful
-### Elegant
-### .current[Easy]
-### Professional
-]
-.right-column[
-# Easy
+class: center, middle
 
-Easy to learn if you know Java, C#, or TypeScript
+# Syntactic sugar
 
-Principle of least surprise
+---
 
-Good documentation and examples
+# Syntactic sugar 1/2
 
-]
+Terse constructors and properties
+
+Constructors and factory methods look identical
+
+Extension methods
+
+Named arguments
+
+Data classes and destructuring
+
+Sealed classes
+
+Strings: templates and multi-line
+
+Nullable handling (smart type inference, platform types, `?.`, `?:`, `let`, `lateinit` etc.)
+
+Ranges
+
+`when` (super-`switch`/`if-else`)
+
+???
+
+Named arguments are automatically available for any Kotlin function, including constructors.
+Doesn't work for calling into Java because Java may not retain argument names.
+
+Sealed classes only allow direct subclasses defined in the same file.
+Use for partially restricted hierarchies, e.g., HTTP status codes:
+there are five standard subclasses, but some server implementations
+such as IIS add their own sub-status codes such as
+`404.4 No handler was found to serve the request`.
+
+Data classes let you define final classes with auto-generated (but overridable)
+`equals`, `hashCode`, and `toString` methods.
+
+---
+
+# Syntactic sugar 2/2
+
+`var name: Type`: ordered so long types don’t obscure the name
+
+Interfaces can have behavior (but not state)
+
+lambda-to-SAM for JVM can be explicit (`val run = Runnable { ... }`)
+
+Explicit syntax for `override` and `tailrec`
+
+Explicit singletons
+
+Operator overloading
+
+Infix functions
+
+Calling multiple methods on an object instance (`with { ... }`)
+
+`this@scope`
+
+`return`/`continue`/`break@scope`
+
+???
+
+SAM = Interface with a Single Abstract Method, which can be automatically implemented
+by a suitable lambda.
+
+Explicit syntax for method overrides and tail recursion is good because
+it means the compiler will tell you if the code changes such that your
+method is no longer an override (because the base method changed or was
+removed) or is no longer tail-recursive.
+
+Lots of operators you can override, including `get` (like C++ `operator []`)
+and `invoke` (like C++ `operator ()`).  There's no equivalent of C++'s
+`operator *`/ `operator ->` but delegated properties are similar.
+You can't define your own operators, which is a good thing for eas of
+understanding by other developers.
+
+There are various other helper methods like `with`; use carefully to avoid
+code which is confusing to Kotlin newbies.
+
+`this@scope` lets you pick which object to use as `this` when you're deep in
+nested lambdas, functions, or clases.
+
+`return`/`continue`/`break@scope` let you jump out only part way from
+multiple levels of inline lambada nesting.
+
+---
+
+class: center, middle
+
+# Nice surprises
+
+---
+
+# Nice surprises
+
+Co- and contra-variance at both declaration and use sites.
+
+If-not-null (`?.`, `?:`) can `throw`/`return`/`continue`/`break`
+
+Generic type information is erased
+
+* ... but there’s a shorthand to get it in inline functions (`<reified T>`)
+
+Multi-file classes (like C++, or C# `partial class`; JVM only)
+
+---
+
+class: center, middle
+
+# Not-so-nice(?) surprises
+
+---
+
+# Not-so-nice(?) surprises
+
+No ternary operator: `if` is an expression
+
+No collection literals: `listOf(1, 2, 3, ...)`, `mapOf(1 to "one", ...)`
+
+No implicit numeric conversions, not even widening
+
+* ... to avoid surprises comparing JVM boxed values of different types
+
+Classes final by default
+
+* ... because extensibility should be an explicit API decision
+
+* ... compiler option/plugin for "open by default"
+
+`protected` members not visible to other instances of type/subtype
+
+Ranges are open at both ends: `1..10` is "1, 2, ..., 10"
+
+???
+
+Ternary operator and collection literals may be added in future; see forums / surveys.
+
+---
+
+class: center, middle
+
+# Other aspects
 
 ---
 
 .left-column[
-## Why?
-### Cross-ecosystem
-### Powerful
-### Elegant
-### Easy
-### .current[Professional]
+## Other aspects
 ]
 .right-column[
 # Professional
-
+]
+.clear[
 Commercially supported by creators, JetBrains
 
 * Used internally for their products
@@ -892,89 +1018,41 @@ Also integrates with Eclipse, Android Studio, Maven, Gradle
 Compiler is open source (Apache licence)
 
 Active communities on forums, StackOverflow, Slack, etc.
+
+... but JavaScript debugging is painful without commercial version of IntelliJ IDEA.
 ]
 
 ---
 
 .left-column[
-## Delightful!
-### Awesome things
-### Syntactic sugar
-### Nice surprises
+## Other aspects
 ]
 .right-column[
-# Professional
-
-Commercially supported by creators, JetBrains
-
-* Used internally for their products
-
-Well supported even in free version of IntelliJ IDEA
-
-Also integrates with Eclipse, Android Studio, Maven, Gradle
-
-* You can even write Gradle scripts in Kotlin!
-
-Compiler is open source (Apache licence)
-]
-
----
-
-# Code Sample
-
-```
-class MapWithDefault<K, out V>(
-        private val m: MutableMap<K, V>,
-        private val defaultValue: () -> V
-) : Map<K, V> `by m` {
-    override fun get(key: K): V? = m.getOrPut(key, defaultValue)
-}
-```
-
---
-
-```
-fun <K, V> MutableMap<K, V>.withDefaultValue(
-        defaultValue: () -> V
-): Map<K, V> = MapWithDefault(this, defaultValue)
-```
-
-
----
-
-# Sealed classes
-
-TODO: HTTP response codes
-
----
-
-
-Co- and contra-variance at both declaration and use sites.
-
----
-
 # Parsimony
+]
+.clear[
+Properties, functions, delegated properties, and extension functions  
+can exist at top-level, within a class, or within a function.  
+Within a class, they can all be overridable.
 
-## Extensions
+Property delegation is based on objects, not classes,  
+so you can use singleton objects as delegates.
 
-Properties, delegated properties, and extension functions
-can exist at top-level, within a class, or within a function.
+The syntax for what looks like static methods from other languages  
+is actually for instance methods on a per-class singleton `companion object`,  
+which can implement interfaces.
 
-Property delegation is based on objects, not classes, so you can use singleton objects as delegates.
-
-Constructors and factory methods have the same syntax,
+Constructors and factory methods have the same syntax,  
 so switching to use factory methods needs little code change.
 
 Coroutines can be extended to async calls, sequence generators, channels, thread pools, etc.
-
-
+]
 
 ---
 
-# Gotchas
+class: center, middle
 
-Ranges are open at both ends: `1..10` is "1, 2, ..., 10"
-
+# The End :-)
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
