@@ -31,13 +31,27 @@
         margin-top: -0.66em;
       }
       */
-      code {
+      .remark-code, .remark-inline-code {
+        background: black;
+        font-family: 'Fira Mono', monospace;
         border-radius: 5px;
+        padding: .5em;
       }
-      .remark-code, .remark-inline-code { font-family: 'Fira Mono', monospace; }
+      .remark-inline-code {
+        background: #111;
+        border-radius: 5px;
+        padding: .2em;
+      }
       .remark-code-span-highlighted {
         background-color: rgba(255, 255, 0, 0.35);
+        border-radius: 5px;
         border: 1.5px solid #BB0;
+      }
+      .remark-code-line-highlighted {
+        background-color: rgba(255, 255, 0, 0.35);
+        border-width: 0px 2px;
+        border-style: solid;
+        border-color: #BB0;
       }
       
       /* Two-column layout */
@@ -135,40 +149,25 @@ Not because it's a panacea
 
 # Delightful features (IMHO)
 
-* Cross-ecosystem
-* Type inference
-* Types are non-nullable by default
-* No checked exceptions
-* Inline functions + lambdas = syntactic macros & type-safe builders
-* Coroutines
-* Property delegation
-* Class delegation
-* Co- and contra-variance, at both declaration and use sites
+Cross-ecosystem
 
----
+Type inference
 
-.left-column[
-## Delightful features
-### .current[Cross-ecosystem]
-### Type inference
-### Non-null types
-### Inline + lambdas
-### Coroutines
-### Property delegation
-### Class delegation
-### Type variance
-]
-.right-column[
-Apply the same language cross-platform and cross-stack
+Types are non-nullable by default
 
-Compile to JVM, JavaScript, or native code (alpha)
+No checked exceptions
 
-Standard cross-platform libary
+Inline functions + lambdas = syntactic macros & type-safe builders
 
-Easy access to other platform libraries
+Property delegation
 
-In future, build multi-platform modules
-]
+Class delegation
+
+Coroutines
+
+???
+
+These slides will skip most details of features which are similar to other languages focus on the cool bits :-)
 
 ---
 
@@ -201,7 +200,7 @@ In future, build multi-platform modules
 .clear[
 Based on JDK 7, 8, or 9
 
-Easy to learn if you know Java
+Easy to learn if you know Java (or Groovy, or C#)
 
 Great interop both ways
 
@@ -257,7 +256,7 @@ Efficient, type-safe access to C
 
 * `cinterop` generates Kotlin wrappers from C headers
 
-Create multi-platform libraries
+Create EXEs and multi-platform static libraries
 
 Platforms: Ubuntu Linux, Raspberry Pi, iOS, MacOS, Windows
 
@@ -282,16 +281,16 @@ https://blog.jetbrains.com/kotlin/2017/06/kotlinnative-v0-3-is-out/
 .clear[
 ```
 class Person(
-        val name: String,
-        var nickname: String? = null
+        val name: `String`,
+        var nickname: String`?` = null
 ) {
 
     fun sayHello() {
-        val splitNick = nickname?.split(' ')
+        val splitNick = nickname`?.`split(' ')
         val myName = when(splitNick?.size) {
             null -> name
             // At this point Kotlin knows splitNick is not null
-            1 -> nickname ?: name
+            1 -> nickname `?:` name
             else -> splitNick.map { it.first() }.joinToString()
         }
         println("Hello, my name is $myName")
@@ -301,30 +300,41 @@ class Person(
 ]
 
 ???
+
+If you call a Java API, Kotlin lets you treat it as nullable or not.
+If you treat it as non-nullable and it is in fact `null`, you'll get a
+`NullPointerException` as soon as you try to use it.
+
+The compiler knows about various standard Java annotations for annotating nullability
+so, if a libary you're calling makes use of them, the compiler will take them into
+account to give you warnings/errors when you call methods and handle return values.
+
+This slide also shows type inference; see following slides for more detail.
+
 ---
 
 .left-column[
 ### Delightful features
 ]
 .right-column[
-# Type inference
+# Type inference 1/2
 ]
 .clear[
 ```
 // size inferred as Double
-var size = 10.0
+var `size` = 10.0
 fun foo1() {
     size = 11 // compile error
 }
 
 fun <T> forEach(items: Collection<T>, block: (T) -> Unit) {
     // item inferred as T
-    for (item in items) block(item)
+    for (`item` in items) block(item)
 }
 
 fun foo2() {
     // it inferred as Int
-    forEach(listOf(1, 2, 3)) { print(it + 1) }
+    forEach(listOf(1, 2, 3)) { print(`it` + 1) }
 }
 ```
 ]
@@ -337,22 +347,21 @@ fun foo2() {
 ### Delightful features
 ]
 .right-column[
-# Type inference
+# Type inference 2/2
 ]
 .clear[
 ```
 // Return type defaults to Unit (like void)
 fun <T> maybeDo(o: T?, block: (T) -> Unit) {
-    if (o != null) {
+    if (`o != null`) {
         // o inferred as T (not T?)
-        block(o)
+        block(`o`)
     }
 }
 
-// Shorthand for single-expression function
 fun throwAnything(o: Any): Nothing = when(o) {
-    is Throwable -> throw o // o inferred as Throwable
-    is String -> throw Exception(o) // o inferred as String
+    `is Throwable` -> throw o // o inferred as Throwable
+    `is String` -> throw Exception(o) // o inferred as String
     else -> throw Exception(o.toString())
 }
 ```
@@ -360,7 +369,12 @@ fun throwAnything(o: Any): Nothing = when(o) {
 
 ???
 
-Return type of `Nothing` implies "does not return".
+The definition of `throwAnything` shows the shorthand for a single-expression function.
+
+The return type of `Nothing` means "does not return".  The compiler will, for example,
+warn you about dead code if you have any code after a call to function returning `Nothing`.
+
+---
 
 .left-column[
 ### Delightful features
@@ -369,7 +383,13 @@ Return type of `Nothing` implies "does not return".
 # No checked exceptions
 ]
 .clear[
-'Nuff said
+The theory of checked exceptions is: they are part of an API, so they should be explicit.
+
+* That's only useful when there's something you can do about a particular case of error.
+
+* It's only useful if the exceptions distinguish each kind of error.
+
+* Layering is verbose, with `try/catch` and per-layer exception classes.
 ]
 
 ???
@@ -383,7 +403,7 @@ Return type of `Nothing` implies "does not return".
 ]
 .clear[
 ```
-inline fun <T: Closeable?> T.autoClose(block: (T) -> Unit) {
+ `inline` fun <T: Closeable?> T.autoClose(block: (T) -> Unit) {
     var caught: Boolean = false
     try {
         block(this)
@@ -398,7 +418,7 @@ inline fun <T: Closeable?> T.autoClose(block: (T) -> Unit) {
 
 fun getFirstLineStartingWith(fileName: String, prefix: String): String? {
     FileReader(File("foo.txt")).autoClose {
-        it.useLines { it.forEach { if (it.startsWith(prefix)) return it } }
+        it.useLines { it.forEach { if (it.startsWith(prefix)) `return` it } }
     }
     return null
 }
@@ -420,10 +440,92 @@ on how function-typed arguments can be inlined.
 ### Delightful features
 ]
 .right-column[
-# Property delegation
+# Property delegation: lazy
 ]
 .clear[
+```
+inline fun retry(count: Int, block: () -> Unit) {
+    val exceptions `by lazy` { LinkedList<Exception>() }
+    for (i in 0 until count) {
+        try { block(); return }
+        catch (e: Exception) { exceptions.add(e) }
+    }
+    val message = when (exceptions.size) {
+        0 -> "Count must be a positive integer"
+        1 -> throw exceptions[0]
+        else -> "Failed after $count retry attempts"
+    }
+    throw RuntimeException(message).apply {
+        for (e in exceptions) addSuppressed(e)
+    }
+}
+```
+]
 
+???
+
+`lazy` is a delegate from the Kotlin standard library, along with `observable` and `vetoable`
+
+In this example, the linked list of exceptions is not created until it's needed.
+
+---
+
+.left-column[
+### Delightful features
+]
+.right-column[
+# Property delegation: SQL 1/3
+]
+.clear[
+```
+interface HasSqlId {
+    val table: String
+    val pkCol: String
+    val id: Int
+}
+
+object DbConfig {
+    lateinit var url: String
+}
+
+class Vehicle(override val id: Int) : HasSqlId {
+    override val table = "vehicle"
+    override val pkCol = "id"
+    var type: String `by sql()`
+    var make: String by sql()
+    var model: String by sql()
+}
+```
+]
+
+???
+
+Here's an example using a custom delegate.  A delegate object has to provide two 
+
+---
+
+.left-column[
+### Delightful features
+]
+.right-column[
+# Property delegation: SQL 2/3
+]
+.clear[
+```
+class SqlDelegateFactory {
+    operator fun provideDelegate(thisRef: HasSqlId, prop: KProperty<*>):
+            ReadWriteProperty<HasSqlId, String> {
+        DriverManager.getConnection(DbConfig.url).use {
+            it.prepareStatement("select 1 from ${thisRef.table} where 1 = 0").use {
+                it.execute() // throws if table doesn't exist
+            }
+        }
+        return SqlDelegate()
+    }
+}
+
+fun `sql()` = SqlDelegateFactory()
+```
 ]
 
 ???
@@ -433,10 +535,68 @@ on how function-typed arguments can be inlined.
 ### Delightful features
 ]
 .right-column[
+# Property delegation: SQL 3/3
+]
+.clear[
+```
+class SqlDelegate : ReadWriteProperty<HasSqlId, String> {
+    private fun getStmt(thisRef: HasSqlId, property: KProperty<*>) =
+            "SELECT ${property.name} FROM ${thisRef.table} WHERE ${thisRef.pkCol} = ?"
+            
+    override fun getValue(thisRef: HasSqlId, property: KProperty<*>): String {
+        DriverManager.getConnection(DbConfig.url).use {
+            it.prepareStatement(getStmt(thisRef, property)).use {
+                it.setInt(1, thisRef.id)
+                it.executeQuery().use {
+                    return if (it.first()) it.getString(property.name)
+                    else throw IllegalArgumentException("ID ${thisRef.id} not found")
+                }
+            }
+        }
+    }
+    
+    override fun setValue(thisRef: HasSqlId, property: KProperty<*>, value: String) = `TODO()`
+}
+```
+]
+
+???
+
+Delegates don't have to implement the `ReadWriteProperty` or `ReadOnlyProperty` interfaces,
+they just have to provide `operator fun getValue`/`setValue` with the right signature.
+
+The `TODO()` function always throws a "not implemented" exception.
+
+---
+
+.left-column[
+### Delightful features
+]
+.right-column[
 # Class delegation
 ]
 .clear[
+```
+class LimitedIterator<T>(
+        val limit: Int,
+        private val wrapped: Iterator<T>
+): Iterator<T> by wrapped {
+    private var count = 0
 
+    override fun next(): T {
+        if (++count > limit) {
+            throw IllegalStateException("No more than $limit items can be read")
+        }
+        return wrapped.next()
+    }
+
+    override fun hasNext(): Boolean {
+        return count < limit && wrapped.hasNext()
+    }
+    
+    // No override of 'remove', so it's just delegated to 'wrapped'.
+}
+```
 ]
 
 ???
@@ -449,17 +609,153 @@ on how function-typed arguments can be inlined.
 # Coroutines
 ]
 .clear[
+Suspend execution of a code block without blocking a thread; resume on any thread later.
 
+* Compiler converts the block to a state machine.
+
+* Suspend/resume at calls to any `suspend fun`.
+
+Extension of C#2/ES6 generators/`yield`, C#5/ES7 `async`/`await`, Go channels/`select`, ...
+
+Your code can freely customise dispatch of coroutines.
+
+Coroutines can be serialisable so
+
+* "any thread" can be in another process;
+
+* "later" can be after reloading from persistent store.
 ]
 
 ???
 ---
 
+.left-column[
+### Delightful features
+]
+.right-column[
+# Coroutines: JS callbacks
+]
+.clear[
+```JavaScript
+$.ajax("https://server/api/firstStep", {
+    success: function (data, status, req) {
+        var key = data;
+        $.ajax("https://server/api/secondStep?key=" + key, {
+            success: function (data, status, req) {
+                window.setTimeout(function() { $("#result").text(data); }, 0);
+            },
+            error: function (req, status, error) {
+                window.setTimeout(function() { $("#result").text("Invalid key: " + key); }, 0);
+            }
+        })
+    },
+    error: function (req, status, error) {
+        window.setTimeout(function() { $("#result").text("Failed to get key: " + error); }, 0);
+    }
+});
+```
+]
 
+???
+---
 
+.left-column[
+### Delightful features
+]
+.right-column[
+# Coroutines: JS Promises
+]
+.clear[
+```JavaScript
+var key = data
+$.ajax("https://server/api/firstStep")
+    .then(function (data, status, req) {
+        key = data;
+        $.ajax("https://server/api/secondStep?key=" + key)
+    })
+    .catch(function (req, status, error) {
+        window.setTimeout(function() { $("#result").text("Invalid key: " + key); }, 0);
+    })
+    .then(function (data, status, req) {
+        window.setTimeout(function() { $("#result").text(data); }, 0);
+    })
+    .catch(function (req, status, error) {
+        window.setTimeout(function() { $("#result").text("Failed to get key: " + error); }, 0);
+    };
+```
+]
 
+???
+---
+
+.left-column[
+### Delightful features
+]
+.right-column[
+# Coroutines: Kotlin JS 1/2
+]
+.clear[
+```
+fun doAjax() = async {
+    fun showResult(result: Any?) =
+            window.setTimeout({ jQuery("#result").text(result.toString()) })
+    var key: Any? = null
+    try {
+        key = jQuery.ajax("https://server/api/firstStep").await()
+        showResult(jQuery.ajax("https://server/api/secondStep?key=$key").await())
+    } catch(e: Exception) {
+        if (key == null) {
+            showResult("Failed to get key: ${e.message}")
+        } else {
+            showResult("Invalid key $key: ${e.message}")
+        }
+    }
+}
+```
+]
+
+???
+
+This example assumes the existence of `external` definitions for jQuery, and of
+the definition for JavaScript's `Promise` type in the Kotlin standard library.
+.
 
 ---
+
+.left-column[
+### Delightful features
+]
+.right-column[
+# Coroutines: Kotlin JS 2/2
+]
+.clear[
+```
+external interface JQueryPromise<out T> { 
+    fun then( // Real definition has other overloads ...
+        doneFilter: (value: T?, values: Any) -> Unit,
+        failFilter: ((reasons: Any) -> Any)? = definedExternally
+    ): JQueryPromise<Unit>
+}
+
+fun <T> async(c: suspend () -> T): Promise<T> {
+    return Promise { resolve, reject ->
+        c.startCoroutine(object : Continuation<T> {
+            override fun resume(value: T) = resolve(value)
+            override fun resumeWithException(exception: Throwable) = reject(exception)
+            override val context = EmptyCoroutineContext
+        })
+    }
+}
+
+inline suspend fun <T> JQueryPromise<T>.await() = suspendCoroutine<T?> { c ->
+    then({ v, vs -> c.resume(v) }, { reasons -> c.resumeWithException(reasons as Throwable) })
+}
+```
+]
+
+???
+---
+
 
 .left-column[
 ## Why?
@@ -608,9 +904,32 @@ fun <K, V> MutableMap<K, V>.withDefaultValue(
 ): Map<K, V> = MapWithDefault(this, defaultValue)
 ```
 
+
 ---
 
 
+Co- and contra-variance at both declaration and use sites.
+
+---
+
+# Parsimony
+
+## Extensions
+
+Extension methods and properties can exist at top-level, within a class, or within a function.
+
+## Property delegation
+
+Delegated properties can exist at top-level, within a class, or within a function.
+
+Property delegation is based on objects, not classes, so you can use singleton objects as delegates.
+
+
+---
+
+# Gotchas
+
+Ranges are open at both ends: `1..10` is "1, 2, ..., 10"
 
 
     </textarea>
@@ -622,6 +941,7 @@ fun <K, V> MutableMap<K, V>.withDefaultValue(
         highlightLanguage: 'kotlin',
         highlightStyle: 'tomorrow-night-bright',
         highlightSpans: true,
+        highlightLines: true,
       });
     </script>
   </body>
