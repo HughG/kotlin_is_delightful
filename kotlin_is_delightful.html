@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Title</title>
+    <title>Kotlin is Delightful</title>
     <meta charset="utf-8">
     <style>
       @import url(https://fonts.googleapis.com/css?family=Fira+Mono|Merriweather:300|Open+Sans);
@@ -12,6 +12,12 @@
       body.remark-container {
         background: #000;
         color: #ddd;
+      }
+      .footnote {
+        position: absolute;
+        font-size: smaller;
+        bottom: 3em;
+        right: 1.5em;
       }
       .remark-slide-scaler {
           transform-origin: top-left;
@@ -51,7 +57,9 @@
         border-style: solid;
         border-color: #BB0;
       }
-      
+      .remark-notes-area .remark-inline-code {
+        color: #FFF;
+      }
       /* Two-column layout */
       .left-column {
         color: #888;
@@ -92,6 +100,8 @@ class: center, middle
 ## Hugh Greene <hughg@tameter.org>  
 
 ### June 2017
+
+.footnote[Presentation made with [remarkjs](https://remarkjs.com/).]
 
 ???
 
@@ -141,27 +151,15 @@ However, good tools make a developer's life more pleasant.
 
 ... and also
 
---
-
 * cross-ecosystem
-
---
 
 * powerful
 
---
-
 * parsimonious
-
---
 
 * pragmatic
 
---
-
 * easy to learn
-
---
 
 * professional
 
@@ -176,7 +174,7 @@ Pragmatic in that it gives you clear, easy ways to do many things.
 Easy to learn if you know Java, Groovy, C#, Swift, and probably C++.
 Worth learning if you know JavaScript or TypeScript.
 
-Professional in the sense that it has good tooling, commercial support, and is stable.
+Professional in the sense that it has good tooling (IntelliJ, Eclipse; Maven, Gradle), commercial support, and is stable.
 
 ---
 
@@ -196,7 +194,7 @@ Types are non-nullable by default
 
 No checked exceptions
 
-Inline functions + lambdas = syntactic macros & type-safe builders
+Inline functions + lambdas = block-structure macros & type-safe DSLs/builders
 
 Property delegation
 
@@ -276,7 +274,7 @@ Build your own standard JS modules
 
 ???
 
-Not a strict supserset of Flow (e.g., no union types) but does more than just provide better type info.
+Not a strict supserset of TypeScript or Flow (e.g., no union types) but does more than just provide better type info.
 
 ---
 
@@ -491,7 +489,7 @@ on how function-typed arguments can be inlined.
 ### Delightful features
 ]
 .right-column[
-# Inline + lambdas: builders
+# Inline + lambdas: DSL/builder
 ]
 .clear[
 ```
@@ -592,7 +590,9 @@ class Vehicle(override val id: Int) : HasSqlId {
 
 ???
 
-Here's an example using a custom delegate.  A delegate object has to provide two 
+Here's an example using a custom delegate.  A delegate object has to provide one or two functions,
+`getValue` and `setValue`, _or_ a `provideDelegate` function which returns an object providing
+`getValue`/`setValue`.
 
 ---
 
@@ -690,6 +690,10 @@ class LimitedIterator<T>(
 ]
 
 ???
+
+Class delegation makes re-use by composition as easy as re-use by inheritance, which I think is a subtle but really
+powerful thing.
+
 ---
 
 .left-column[
@@ -717,6 +721,9 @@ Coroutines can be serialisable so
 ]
 
 ???
+
+No big restructuring of your code needed -- a coroutine block of code looks much like a normal code block.
+
 ---
 
 .left-column[
@@ -950,7 +957,7 @@ class: center, middle
 
 Co- and contra-variance at both declaration and use sites.
 
-If-not-null (`?.`, `?:`) can `throw`/`return`/`continue`/`break`
+If-not-null (`?:`, etc.) can `throw`/`return`/`continue`/`break`
 
 Generic type information is erased
 
@@ -984,7 +991,7 @@ Classes final by default
 
 `protected` members not visible to other instances of type/subtype
 
-Ranges are open at both ends: `1..10` is "1, 2, ..., 10"
+Ranges are closed: `0..10` is "0, 2, ..., 10", not "... 9".
 
 ???
 
@@ -1011,6 +1018,8 @@ Commercially supported by creators, JetBrains
 
 Well supported even in free version of IntelliJ IDEA
 
+... but JavaScript debugging is painful without commercial version of IntelliJ IDEA.
+
 Also integrates with Eclipse, Android Studio, Maven, Gradle
 
 * You can even write Gradle scripts in Kotlin!
@@ -1018,8 +1027,6 @@ Also integrates with Eclipse, Android Studio, Maven, Gradle
 Compiler is open source (Apache licence)
 
 Active communities on forums, StackOverflow, Slack, etc.
-
-... but JavaScript debugging is painful without commercial version of IntelliJ IDEA.
 ]
 
 ---
